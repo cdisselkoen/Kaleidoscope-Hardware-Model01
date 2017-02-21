@@ -35,7 +35,7 @@ class Model01 {
     keydata_t previousRightHandState;
 
   private:
-    static bool isLEDChanged;
+    static uint8_t isLEDChanged;
     static KeyboardioScanner leftHand;
     static KeyboardioScanner rightHand;
 };

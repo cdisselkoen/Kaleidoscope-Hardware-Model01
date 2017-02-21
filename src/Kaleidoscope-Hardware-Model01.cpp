@@ -3,7 +3,7 @@
 
 KeyboardioScanner Model01::leftHand(0);
 KeyboardioScanner Model01::rightHand(3);
-bool Model01::isLEDChanged;
+uint8_t Model01::isLEDChanged;
 
 static constexpr uint8_t key_led_map[4][16] = {
   {3,4,11,12,19,20,26,27,     36,37,43,44,51,52,59,60},
@@ -53,6 +53,7 @@ void Model01::setup(void) {
     enable_high_power_leds();
     leftHandState.all = 0;
     rightHandState.all = 0;
+    isLEDChanged = 0xff;
 
     TWBR=12; // This is 400mhz, which is the fastest we can drive the ATTiny
 }
@@ -61,12 +62,16 @@ void Model01::setup(void) {
 void Model01::led_set_crgb_at(uint8_t i, cRGB crgb) {
     if(i<32) {
         cRGB oldColor = led_get_crgb_at(i);
-        isLEDChanged |= !(oldColor.r == crgb.r && oldColor.g == crgb.g && oldColor.b == crgb.b);
+        uint8_t bank = i / 8;
+        if (!(oldColor.r == crgb.r && oldColor.g == crgb.g && oldColor.b == crgb.b))
+            bitWrite(isLEDChanged, bank, 1);
 
         leftHand.ledData.leds[i] = crgb;
     } else if (i<64) {
         cRGB oldColor = led_get_crgb_at(i);
-        isLEDChanged |= !(oldColor.r == crgb.r && oldColor.g == crgb.g && oldColor.b == crgb.b);
+        uint8_t bank = (i - 32) / 8;
+        if (!(oldColor.r == crgb.r && oldColor.g == crgb.g && oldColor.b == crgb.b))
+            bitWrite(isLEDChanged, bank + 4, 1);
 
         rightHand.ledData.leds[i-32] = crgb;
     } else {
@@ -93,19 +98,14 @@ void Model01::led_sync() {
     if (!isLEDChanged)
         return;
 
-    leftHand.sendLEDData();
-    rightHand.sendLEDData();
+    for (uint8_t bank = 0; bank < 4; bank++) {
+        if (bitRead (isLEDChanged, bank))
+            leftHand.sendLEDBank(bank);
+        if (bitRead (isLEDChanged, bank + 4))
+            rightHand.sendLEDBank(bank);
+    }
 
-    leftHand.sendLEDData();
-    rightHand.sendLEDData();
-
-    leftHand.sendLEDData();
-    rightHand.sendLEDData();
-
-    leftHand.sendLEDData();
-    rightHand.sendLEDData();
-
-    isLEDChanged = false;
+    isLEDChanged = 0;
 }
 
 boolean Model01::led_power_fault() {
