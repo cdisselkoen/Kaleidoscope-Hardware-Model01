@@ -60,11 +60,17 @@ void Model01::setup(void) {
 
 
 void Model01::led_set_crgb_at(uint8_t i, cRGB crgb) {
+    if (i > 63)
+        return;
+
     cRGB oldColor = led_get_crgb_at(i);
     uint8_t bank = i / 8;
 
     if (((oldColor.r == crgb.r) && (oldColor.g == crgb.g) && (oldColor.b == crgb.b)))
         return;
+
+    Serial.print ("i=");
+    Serial.println (i);
 
     bitWrite(isLEDChanged, bank, 1);
 
@@ -72,9 +78,6 @@ void Model01::led_set_crgb_at(uint8_t i, cRGB crgb) {
         leftHand.ledData.leds[i] = crgb;
     } else if (i<64) {
         rightHand.ledData.leds[i-32] = crgb;
-    } else {
-        // TODO how do we want to handle debugging assertions about crazy user
-        // code that would overwrite other memory?
     }
 }
 
@@ -99,13 +102,10 @@ void Model01::led_sync() {
     for (uint8_t bank = 0; bank < 4; bank++) {
         if (bitRead (isLEDChanged, bank)) {
             leftHand.sendLEDBank(bank);
-            //delay(2);
         }
         if (bitRead (isLEDChanged, bank + 4)) {
             rightHand.sendLEDBank(bank);
-            //delay(2);
         }
-        //delay(10);
     }
 
     isLEDChanged = 0;
