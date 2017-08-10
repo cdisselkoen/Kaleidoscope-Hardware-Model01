@@ -5,12 +5,14 @@
 #define HARDWARE_IMPLEMENTATION Model01
 #include "KeyboardioScanner.h"
 
+#include <Kaleidoscope-Hardware.h>
+
 #define COLS 16
 #define ROWS 4
 
 #define CRGB(r,g,b) (cRGB){b, g, r}
 
-class Model01 {
+class Model01 : public kaleidoscope::Hardware {
  public:
   Model01(void);
   void syncLeds(void);
@@ -19,7 +21,6 @@ class Model01 {
   cRGB getCrgbAt(uint8_t i);
   uint8_t getLedIndex(byte row, byte col);
 
-  void scanMatrix(void);
   void readMatrix(void);
   void actOnMatrixScan(void);
   void setup();

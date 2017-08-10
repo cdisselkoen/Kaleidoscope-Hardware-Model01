@@ -177,12 +177,6 @@ void Model01::actOnMatrixScan() {
   }
 }
 
-
-void Model01::scanMatrix() {
-  readMatrix();
-  actOnMatrixScan();
-}
-
 void Model01::rebootBootloader() {
   // Set the magic bits to get a Caterina-based device
   // to reboot into the bootloader and stay there, rather
