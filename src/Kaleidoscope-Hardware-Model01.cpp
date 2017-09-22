@@ -68,12 +68,12 @@ void Model01::setCrgbAt(uint8_t i, cRGB crgb) {
     cRGB oldColor = getCrgbAt(i);
     isLEDChanged |= !(oldColor.r == crgb.r && oldColor.g == crgb.g && oldColor.b == crgb.b);
 
-    leftHand.ledData.leds[i] = crgb;
+    leftHand.ledData.leds[i] = asCBGR(crgb);
   } else if (i < 64) {
     cRGB oldColor = getCrgbAt(i);
     isLEDChanged |= !(oldColor.r == crgb.r && oldColor.g == crgb.g && oldColor.b == crgb.b);
 
-    rightHand.ledData.leds[i - 32] = crgb;
+    rightHand.ledData.leds[i - 32] = asCBGR(crgb);
   } else {
     // TODO(anyone):
     // how do we want to handle debugging assertions about crazy user
@@ -91,9 +91,9 @@ uint8_t Model01::getLedIndex(byte row, byte col) {
 
 cRGB Model01::getCrgbAt(uint8_t i) {
   if (i < 32) {
-    return leftHand.ledData.leds[i];
+    return asCRGB(leftHand.ledData.leds[i]);
   } else if (i < 64) {
-    return rightHand.ledData.leds[i - 32] ;
+    return asCRGB(rightHand.ledData.leds[i - 32]);
   } else {
     return {0, 0, 0};
   }

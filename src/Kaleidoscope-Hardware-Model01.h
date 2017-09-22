@@ -2,13 +2,12 @@
 
 #include <Arduino.h>
 
-#define HARDWARE_IMPLEMENTATION Model01
+#include "Kaleidoscope-Hardware.h"
 #include "KeyboardioScanner.h"
+#define HARDWARE_IMPLEMENTATION Model01
 
 #define COLS 16
 #define ROWS 4
-
-#define CRGB(r,g,b) (cRGB){b, g, r}
 
 class Model01 {
  public:
